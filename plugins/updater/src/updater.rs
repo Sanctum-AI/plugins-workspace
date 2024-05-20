@@ -327,6 +327,10 @@ impl Updater {
                 .send()
                 .await;
 
+            if let Err(err) = &response {
+                last_error = Some(Error::Network(format!("request to {url} failed: {err}")));
+            }
+
             if let Ok(res) = response {
                 if res.status().is_success() {
                     // no updates found!
