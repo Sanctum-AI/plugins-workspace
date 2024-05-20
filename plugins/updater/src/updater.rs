@@ -320,12 +320,17 @@ impl Updater {
                 let proxy = reqwest::Proxy::all(proxy.as_str())?;
                 request = request.proxy(proxy);
             }
+            let url_copy = url.clone();
             let response = request
                 .build()?
                 .get(url)
                 .headers(headers.clone())
                 .send()
                 .await;
+
+            if let Err(err) = &response {
+                last_error = Some(Error::Network(format!("request to {url_copy} failed: {err}")));
+            }
 
             if let Ok(res) = response {
                 if res.status().is_success() {
